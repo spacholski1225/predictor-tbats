@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wskaźnik Dzietności w Polsce | Poland Fertility Rate Chart</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="polish-title">Wskaźnik Dzietności w Polsce (1960-2033)</h1>
+        <h2 class="english-subtitle">Poland Fertility Rate (1960-2033)</h2>
+        <div class="chart-container">
+            <canvas id="fertilityChart"></canvas>
+        </div>
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color historical"></div>
+                <span>Dane historyczne (1960-2023) | Historical Data</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color prediction"></div>
+                <span>Dane prognozowane (2024-2033) | Predicted Data</span>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

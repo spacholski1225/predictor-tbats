@@ -1,0 +1,99 @@
+body {
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f5ff;
+    color: #2c3e50;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.polish-title {
+    text-align: center;
+    margin-bottom: 5px;
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 28px;
+}
+
+.english-subtitle {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: #7f8c8d;
+    font-weight: 300;
+    font-size: 18px;
+}
+
+.chart-container {
+    position: relative;
+    height: 60vh;
+    min-height: 400px;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.03);
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 15px;
+}
+
+.legend-color {
+    width: 25px;
+    height: 4px;
+    margin-right: 10px;
+    border-radius: 2px;
+}
+
+.legend-color.historical {
+    background: linear-gradient(to right, rgba(54, 162, 235, 1), rgba(54, 162, 235, 0.6));
+    box-shadow: 0 1px 3px rgba(54, 162, 235, 0.3);
+}
+
+.legend-color.prediction {
+    background-color: rgba(255, 99, 132, 1);
+    border-top: 2px dashed rgba(255, 99, 132, 1);
+    box-shadow: 0 1px 3px rgba(255, 99, 132, 0.3);
+}
+
+.error {
+    color: #dc3545;
+    text-align: center;
+    padding: 20px;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        height: 50vh;
+        min-height: 300px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .legend-item {
+        margin: 5px 10px;
+    }
+}
