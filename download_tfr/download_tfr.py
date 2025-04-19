@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import json
 
 # Pobranie danych z API World Bank (rok 1939–2023)
 url = (
@@ -18,7 +19,20 @@ df['FertilityRate'] = df['FertilityRate'].astype(float, errors='ignore')
 all_years = pd.DataFrame({'Year': list(range(1939, 2024))})
 df = all_years.merge(df, on='Year', how='left')
 
-# Zapis do CSV
-csv_path = 'fertility_poland_1939_2023.csv'
-df.to_csv(csv_path, index=False, float_format='%.2f')
-print(f"Zapisano dane do pliku: {csv_path}")
+# Czyszczenie danych - usunięcie wierszy bez wartości FertilityRate
+df = df.dropna(subset=['FertilityRate'])
+print(f"Liczba wierszy po usunięciu braków danych: {len(df)}")
+
+# Przygotowanie danych do formatu JSON
+json_data = []
+for _, row in df.iterrows():
+    json_data.append({
+        "year": int(row['Year']),
+        "tfr": float(row['FertilityRate'])
+    })
+
+# Zapis do JSON
+json_path = 'fertility_poland_1939_2023.json'
+with open(json_path, 'w', encoding='utf-8') as f:
+    json.dump(json_data, f, indent=2)
+print(f"Zapisano dane do pliku: {json_path}")
