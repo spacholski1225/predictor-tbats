@@ -76,8 +76,108 @@ The output JSON file contains a list of objects, each with the following structu
 - `main.py`: Main script to run the prediction
 - `utils.py`: Utility functions
 
+## TBATS Model Description and Parameters
+
+### About TBATS Model
+
+TBATS (Trigonometric Seasonality, Box-Cox transformation, ARMA errors, Trend, and Seasonal components) is an advanced statistical model for time series forecasting. The model is designed to handle various time series features such as:
+
+- Linear or non-linear trends
+- Seasonality (including multiple seasonal patterns)
+- Cyclicality
+- Irregularities and noise
+
+TBATS is particularly useful for data that exhibits complex seasonal patterns or when traditional methods like ARIMA do not provide satisfactory results.
+
+### Model Parameters
+
+In the predictor-tbats project, the TBATS model is implemented in the `TBATSPredictor` class in the `tbats_predictor.py` file. The main parameters that can be adjusted are:
+
+- **use_box_cox**: Determines whether to apply Box-Cox transformation to the data. Can take values:
+  - `None` - The model automatically decides whether to use the transformation
+  - `True` - Always use the transformation
+  - `False` - Never use the transformation
+  - `float` - Apply the transformation with a specific lambda parameter
+
+- **use_trend**: Determines whether to include a trend component. Can take values:
+  - `None` - The model automatically decides whether to include a trend
+  - `True` - Always include a trend
+  - `False` - Never include a trend
+
+- **use_damped_trend**: Determines whether to use a damped trend. Can take values:
+  - `None` - The model automatically decides whether to use a damped trend
+  - `True` - Always use a damped trend
+  - `False` - Never use a damped trend
+
+### Customizing Model Parameters
+
+The TBATS model parameters are defined in the `config.py` file in the `TBATS_PARAMS` variable:
+
+```python
+TBATS_PARAMS = {
+    'use_box_cox': None,  # Let the model decide
+    'use_trend': None,    # Let the model decide
+    'use_damped_trend': None  # Let the model decide
+}
+```
+
+To customize the model parameters, you can modify this variable in the `config.py` file or pass parameters directly to the `TBATSPredictor` constructor:
+
+```python
+from predict_data.tbats_predictor import TBATSPredictor
+
+# Example of customizing parameters
+predictor = TBATSPredictor(
+    use_box_cox=True,
+    use_trend=True,
+    use_damped_trend=False
+)
+```
+
+Additionally, the `TBATSPredictor` class offers methods to generate confidence intervals for predictions:
+
+```python
+# Generate predictions with confidence intervals
+lower_bounds, upper_bounds = predictor.get_confidence_intervals(
+    steps=5,
+    confidence_level=0.95
+)
+```
+
+## Programmatic Usage Example
+
+Here's an example of how to use the prediction module programmatically:
+
+```python
+from predict_data.data_loader import load_data, convert_to_time_series, preprocess_data
+from predict_data.tbats_predictor import TBATSPredictor
+from predict_data.utils import format_predictions, combine_data, save_to_json
+
+# Load data
+historical_data = load_data('download_tfr/fertility_poland_1939_2023.json')
+ts_data = convert_to_time_series(historical_data)
+preprocessed_data = preprocess_data(ts_data)
+
+# Train model with custom parameters
+predictor = TBATSPredictor(use_box_cox=True, use_trend=True, use_damped_trend=False)
+fitted_model = predictor.train(preprocessed_data)
+
+# Generate predictions for 7 years
+predictions = predictor.predict(steps=7)
+
+# Format and combine predictions with historical data
+last_year = max(item['year'] for item in historical_data)
+formatted_predictions = format_predictions(historical_data, predictions, last_year + 1)
+combined_data = combine_data(historical_data, formatted_predictions)
+
+# Save results
+save_to_json(combined_data, 'results/custom_predictions.json')
+```
+
 ## Notes
 
 - The TBATS model is configured with default parameters, which should work well for most cases
 - Predictions are validated to ensure they are within reasonable bounds (0 to 10)
 - The application can generate plots to visualize the historical data and predictions
+- The model automatically handles missing values through interpolation
+- For large datasets or complex seasonal patterns, the model training may take some time
