@@ -9,7 +9,6 @@ CORS(app)
 @app.route('/getUnpredictedData', methods=['GET'])
 def get_unpredicted_data():
     try:
-        # Path to the JSON file (relative to the current file)
         current_dir = os.path.dirname(os.path.abspath(__file__))
         json_file_path = os.path.join(current_dir, 'fertility_poland_1939_2023.json')
         
