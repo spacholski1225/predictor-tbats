@@ -3,26 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wskaźnik Dzietności w Polsce | Poland Fertility Rate Chart</title>
+    <title>Wskaźnik Dzietności w Polsce</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1 class="polish-title">Wskaźnik Dzietności w Polsce (1960-2033)</h1>
-        <h2 class="english-subtitle">Poland Fertility Rate (1960-2033)</h2>
+        <h1 class="main-title">Wskaźnik Dzietności w Polsce (1960-2033)</h1>
+        
+        <div class="data-input-container">
+            <h3 class="input-title">Wybierz plik JSON z danymi historycznymi</h3>
+            <div class="file-input-wrapper">
+                <input type="file" id="dataFileInput" accept=".json" class="file-input">
+                <label for="dataFileInput" class="file-input-label">Wybierz plik</label>
+                <span id="fileName" class="file-name">Nie wybrano pliku</span>
+                <a href="sample_data.json" download class="sample-link">Pobierz przykładowy plik</a>
+            </div>
+            <button id="loadDataButton" class="load-button" disabled>Załaduj dane</button>
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+        
         <div class="chart-container">
             <canvas id="fertilityChart"></canvas>
         </div>
         <div class="legend">
             <div class="legend-item">
                 <div class="legend-color historical"></div>
-                <span>Dane historyczne | Historical Data</span>
+                <span>Dane historyczne</span>
             </div>
             <div class="legend-item">
                 <div class="legend-color prediction"></div>
-                <span>Dane prognozowane | Predicted Data</span>
+                <span>Dane prognozowane</span>
             </div>
         </div>
     </div>

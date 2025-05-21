@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fertility Rate Chart Test</title>
+    <title>Test Wykresu Wskaźnika Dzietności</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -64,53 +64,53 @@
 </head>
 <body>
     <div class="container">
-        <h1>Fertility Rate Chart API Test</h1>
+        <h1>Test API Wykresu Wskaźnika Dzietności</h1>
         
         <div class="test-controls">
-            <button id="testApiBtn">Test API Connection</button>
-            <button id="viewDataBtn">View Sample Data</button>
-            <button id="testFallbackBtn">Test Fallback Mechanism</button>
+            <button id="testApiBtn">Testuj połączenie API</button>
+            <button id="viewDataBtn">Pokaż przykładowe dane</button>
+            <button id="testFallbackBtn">Testuj mechanizm awaryjny</button>
             <div class="warning">
-                <strong>Note:</strong> If the API connection fails, the application will automatically use local fallback data.
-                This test page allows you to verify both the API connection and the fallback mechanism.
+                <strong>Uwaga:</strong> Jeśli połączenie z API nie powiedzie się, aplikacja automatycznie użyje lokalnych danych awaryjnych.
+                Ta strona testowa pozwala zweryfikować zarówno połączenie API, jak i mechanizm awaryjny.
             </div>
             <div class="warning" style="margin-top: 10px;">
-                <strong>CORS Warning:</strong> When opening this file directly from the file system, browsers will block API requests due to CORS security restrictions.
-                The "Test API Connection" button will likely fail with a CORS error, which is expected behavior.
-                The application is designed to handle this gracefully by using local data.
+                <strong>Ostrzeżenie CORS:</strong> Podczas otwierania tego pliku bezpośrednio z systemu plików, przeglądarki zablokują żądania API ze względu na ograniczenia bezpieczeństwa CORS.
+                Przycisk "Testuj połączenie API" prawdopodobnie nie zadziała z powodu błędu CORS, co jest oczekiwanym zachowaniem.
+                Aplikacja jest zaprojektowana tak, aby obsłużyć to płynnie, używając lokalnych danych.
             </div>
         </div>
         
         <div class="response-container">
-            <h3>API Response:</h3>
-            <pre id="responseOutput">Click "Test API Connection" to see the response...</pre>
+            <h3>Odpowiedź API:</h3>
+            <pre id="responseOutput">Kliknij "Testuj połączenie API", aby zobaczyć odpowiedź...</pre>
         </div>
         
         <div class="response-container">
-            <h3>Sample Data:</h3>
-            <pre id="sampleDataOutput">Click "View Sample Data" to see the sample data structure...</pre>
+            <h3>Przykładowe dane:</h3>
+            <pre id="sampleDataOutput">Kliknij "Pokaż przykładowe dane", aby zobaczyć strukturę przykładowych danych...</pre>
         </div>
     </div>
 
     <script>
         document.getElementById('testApiBtn').addEventListener('click', function() {
             const responseOutput = document.getElementById('responseOutput');
-            responseOutput.textContent = 'Connecting to API...';
+            responseOutput.textContent = 'Łączenie z API...';
             
-            // Sample historical data (first few entries only for brevity)
+            // Przykładowe dane historyczne (tylko kilka pierwszych wpisów dla zwięzłości)
             const sampleData = [
                 { "year": 1960, "tfr": 2.98 },
                 { "year": 1961, "tfr": 2.83 },
                 { "year": 1962, "tfr": 2.72 },
-                // Add more data as needed for testing
+                // Dodaj więcej danych w razie potrzeby do testowania
             ];
             
-            // Test the API connection
+            // Testowanie połączenia API
             fetch('http://52.17.53.243:5000/predictData', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                    // Note: The following headers would need to be set on the server side
+                    // Uwaga: Poniższe nagłówki musiałyby być ustawione po stronie serwera
                     // 'Access-Control-Allow-Origin': '*',
                     // 'Access-Control-Allow-Methods': 'POST, OPTIONS',
                     // 'Access-Control-Allow-Headers': 'Content-Type'
@@ -119,28 +119,28 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                    throw new Error(`Odpowiedź sieciowa nie była poprawna: ${response.status} ${response.statusText}`);
                 }
                 return response.json();
             })
             .then(data => {
-                responseOutput.textContent = 'Connection successful!\n\nReceived ' + data.length + ' data points.\n\nFirst few entries:\n' + 
-                    JSON.stringify(data.slice(0, 5), null, 2) + 
-                    '\n\nLast few entries:\n' + 
+                responseOutput.textContent = 'Połączenie udane!\n\nOtrzymano ' + data.length + ' punktów danych.\n\nPierwsze wpisy:\n' +
+                    JSON.stringify(data.slice(0, 5), null, 2) +
+                    '\n\nOstatnie wpisy:\n' +
                     JSON.stringify(data.slice(-5), null, 2);
             })
             .catch(error => {
-                // Check if it's a CORS error
+                // Sprawdź, czy to błąd CORS
                 const isCorsError = error.message.includes('CORS') ||
                                    (error instanceof TypeError && error.message === 'Failed to fetch');
                 
                 if (isCorsError) {
-                    responseOutput.textContent = 'CORS Error: The browser blocked the request due to security restrictions.\n\n' +
-                        'This is expected when opening the file directly from the file system.\n\n' +
-                        'The main application will handle this by using local data.\n\n' +
-                        'Technical details: ' + error.message;
+                    responseOutput.textContent = 'Błąd CORS: Przeglądarka zablokowała żądanie ze względu na ograniczenia bezpieczeństwa.\n\n' +
+                        'Jest to oczekiwane zachowanie przy otwieraniu pliku bezpośrednio z systemu plików.\n\n' +
+                        'Główna aplikacja obsłuży to, używając lokalnych danych.\n\n' +
+                        'Szczegóły techniczne: ' + error.message;
                 } else {
-                    responseOutput.textContent = 'Error connecting to API: ' + error.message;
+                    responseOutput.textContent = 'Błąd połączenia z API: ' + error.message;
                 }
             });
         });
@@ -148,7 +148,7 @@
         document.getElementById('viewDataBtn').addEventListener('click', function() {
             const sampleDataOutput = document.getElementById('sampleDataOutput');
             
-            // Show the structure of the data we expect to receive
+            // Pokaż strukturę danych, które spodziewamy się otrzymać
             const sampleResponseStructure = [
                 {
                     "predicted": false,
@@ -160,7 +160,7 @@
                     "tfr": 2.83,
                     "year": 1961
                 },
-                // Historical data continues...
+                // Dane historyczne są kontynuowane...
                 {
                     "predicted": true,
                     "tfr": 1.099,
@@ -171,7 +171,7 @@
                     "tfr": 1.035,
                     "year": 2025
                 }
-                // Predicted data continues...
+                // Dane prognozowane są kontynuowane...
             ];
             
             sampleDataOutput.textContent = JSON.stringify(sampleResponseStructure, null, 2);
@@ -179,29 +179,29 @@
         
         document.getElementById('testFallbackBtn').addEventListener('click', function() {
             const responseOutput = document.getElementById('responseOutput');
-            responseOutput.textContent = 'Testing fallback mechanism...';
+            responseOutput.textContent = 'Testowanie mechanizmu awaryjnego...';
             
-            // Create fallback data with predicted flag (same as in script.js)
+            // Utwórz dane awaryjne z flagą predicted (tak samo jak w script.js)
             const historicalData = [
                 { "year": 1960, "tfr": 2.98 },
                 { "year": 1961, "tfr": 2.83 },
                 { "year": 1962, "tfr": 2.72 }
-                // This is just a sample, the actual data is longer
+                // To tylko przykład, rzeczywiste dane są dłuższe
             ];
             
             const fallbackData = [
-                // Historical data
+                // Dane historyczne
                 ...historicalData.map(item => ({...item, predicted: false})),
                 
-                // Predicted data
+                // Dane prognozowane
                 {"predicted": true, "tfr": 1.099, "year": 2024},
                 {"predicted": true, "tfr": 1.035, "year": 2025},
                 {"predicted": true, "tfr": 0.973, "year": 2026}
-                // This is just a sample, the actual data is longer
+                // To tylko przykład, rzeczywiste dane są dłuższe
             ];
             
-            responseOutput.textContent = 'Fallback mechanism test successful!\n\n' +
-                'This is the data that would be used if the API is unreachable:\n\n' +
+            responseOutput.textContent = 'Test mechanizmu awaryjnego zakończony pomyślnie!\n\n' +
+                'To są dane, które zostałyby użyte, gdyby API było nieosiągalne:\n\n' +
                 JSON.stringify(fallbackData.slice(0, 6), null, 2) + '\n\n...\n\n' +
                 JSON.stringify(fallbackData.slice(-3), null, 2);
         });

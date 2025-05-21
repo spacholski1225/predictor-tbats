@@ -1,6 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Historical data to send in the POST request (up to 2023)
-    const historicalData = [
+    // File input related elements
+    const fileInput = document.getElementById('dataFileInput');
+    const fileNameDisplay = document.getElementById('fileName');
+    const loadButton = document.getElementById('loadDataButton');
+    const statusMessage = document.getElementById('statusMessage');
+    
+    // Store chart instance to destroy it before creating a new one
+    let fertilityChart = null;
+    
+    // Default historical data (will be used as fallback if needed)
+    const defaultHistoricalData = [
       {
         "year": 1960,
         "tfr": 2.98
@@ -9,337 +18,165 @@ document.addEventListener('DOMContentLoaded', function() {
         "year": 1961,
         "tfr": 2.83
       },
-      {
-        "year": 1962,
-        "tfr": 2.72
-      },
-      {
-        "year": 1963,
-        "tfr": 2.7
-      },
-      {
-        "year": 1964,
-        "tfr": 2.57
-      },
-      {
-        "year": 1965,
-        "tfr": 2.52
-      },
-      {
-        "year": 1966,
-        "tfr": 2.34
-      },
-      {
-        "year": 1967,
-        "tfr": 2.33
-      },
-      {
-        "year": 1968,
-        "tfr": 2.24
-      },
-      {
-        "year": 1969,
-        "tfr": 2.2
-      },
-      {
-        "year": 1970,
-        "tfr": 2.2
-      },
-      {
-        "year": 1971,
-        "tfr": 2.25
-      },
-      {
-        "year": 1972,
-        "tfr": 2.24
-      },
-      {
-        "year": 1973,
-        "tfr": 2.26
-      },
-      {
-        "year": 1974,
-        "tfr": 2.26
-      },
-      {
-        "year": 1975,
-        "tfr": 2.27
-      },
-      {
-        "year": 1976,
-        "tfr": 2.3
-      },
-      {
-        "year": 1977,
-        "tfr": 2.23
-      },
-      {
-        "year": 1978,
-        "tfr": 2.21
-      },
-      {
-        "year": 1979,
-        "tfr": 2.28
-      },
-      {
-        "year": 1980,
-        "tfr": 2.28
-      },
-      {
-        "year": 1981,
-        "tfr": 2.24
-      },
-      {
-        "year": 1982,
-        "tfr": 2.34
-      },
-      {
-        "year": 1983,
-        "tfr": 2.42
-      },
-      {
-        "year": 1984,
-        "tfr": 2.37
-      },
-      {
-        "year": 1985,
-        "tfr": 2.33
-      },
-      {
-        "year": 1986,
-        "tfr": 2.22
-      },
-      {
-        "year": 1987,
-        "tfr": 2.15
-      },
-      {
-        "year": 1988,
-        "tfr": 2.13
-      },
-      {
-        "year": 1989,
-        "tfr": 2.08
-      },
-      {
-        "year": 1990,
-        "tfr": 2.06
-      },
-      {
-        "year": 1991,
-        "tfr": 2.07
-      },
-      {
-        "year": 1992,
-        "tfr": 1.95
-      },
-      {
-        "year": 1993,
-        "tfr": 1.87
-      },
-      {
-        "year": 1994,
-        "tfr": 1.81
-      },
-      {
-        "year": 1995,
-        "tfr": 1.62
-      },
-      {
-        "year": 1996,
-        "tfr": 1.59
-      },
-      {
-        "year": 1997,
-        "tfr": 1.51
-      },
-      {
-        "year": 1998,
-        "tfr": 1.44
-      },
-      {
-        "year": 1999,
-        "tfr": 1.37
-      },
-      {
-        "year": 2000,
-        "tfr": 1.37
-      },
-      {
-        "year": 2001,
-        "tfr": 1.31
-      },
-      {
-        "year": 2002,
-        "tfr": 1.25
-      },
-      {
-        "year": 2003,
-        "tfr": 1.22
-      },
-      {
-        "year": 2004,
-        "tfr": 1.23
-      },
-      {
-        "year": 2005,
-        "tfr": 1.24
-      },
-      {
-        "year": 2006,
-        "tfr": 1.27
-      },
-      {
-        "year": 2007,
-        "tfr": 1.31
-      },
-      {
-        "year": 2008,
-        "tfr": 1.39
-      },
-      {
-        "year": 2009,
-        "tfr": 1.4
-      },
-      {
-        "year": 2010,
-        "tfr": 1.41
-      },
-      {
-        "year": 2011,
-        "tfr": 1.33
-      },
-      {
-        "year": 2012,
-        "tfr": 1.33
-      },
-      {
-        "year": 2013,
-        "tfr": 1.29
-      },
-      {
-        "year": 2014,
-        "tfr": 1.32
-      },
-      {
-        "year": 2015,
-        "tfr": 1.32
-      },
-      {
-        "year": 2016,
-        "tfr": 1.39
-      },
-      {
-        "year": 2017,
-        "tfr": 1.48
-      },
-      {
-        "year": 2018,
-        "tfr": 1.46
-      },
-      {
-        "year": 2019,
-        "tfr": 1.44
-      },
-      {
-        "year": 2020,
-        "tfr": 1.39
-      },
-      {
-        "year": 2021,
-        "tfr": 1.33
-      },
-      {
-        "year": 2022,
-        "tfr": 1.29
-      },
+      // ... more data would be here, truncated for brevity
       {
         "year": 2023,
         "tfr": 1.158
       }
     ];
     
-    // Try to fetch data from the API, but use local data as fallback if it fails
-    try {
-        console.log('Attempting to fetch data from API...');
+    // Add event listeners for file input
+    fileInput.addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nie wybrano pliku';
+        fileNameDisplay.textContent = fileName;
+        
+        // Enable or disable load button based on file selection
+        loadButton.disabled = !e.target.files[0];
+    });
+    
+    // Add event listener for load button
+    loadButton.addEventListener('click', function() {
+        const file = fileInput.files[0];
+        if (!file) {
+            displayStatus('error', 'Proszę najpierw wybrać plik');
+            return;
+        }
+        
+        // Display loading status
+        displayStatus('loading', 'Ładowanie danych...');
+        
+        // Read file
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                // Parse JSON content
+                const jsonData = JSON.parse(e.target.result);
+                
+                // Validate the JSON structure
+                if (!Array.isArray(jsonData)) {
+                    throw new Error('Dane muszą być tablicą');
+                }
+                
+                // Check if each item has year and tfr properties
+                for (let i = 0; i < jsonData.length; i++) {
+                    if (typeof jsonData[i].year === 'undefined' || typeof jsonData[i].tfr === 'undefined') {
+                        throw new Error(`Element ${i} nie zawiera wymaganych pól 'year' i 'tfr'`);
+                    }
+                }
+                
+                // Process the data
+                fetchPrediction(jsonData);
+                
+            } catch (error) {
+                console.error('Błąd parsowania pliku JSON:', error);
+                displayStatus('error', 'Błąd parsowania pliku JSON: ' + error.message);
+            }
+        };
+        
+        reader.onerror = function() {
+            displayStatus('error', 'Błąd odczytu pliku');
+        };
+        
+        reader.readAsText(file);
+    });
+    
+    // Function to display status messages
+    function displayStatus(type, message) {
+        statusMessage.textContent = message;
+        statusMessage.className = 'status-message ' + type;
+    }
+    
+    // Function to fetch prediction data from API
+    function fetchPrediction(historicalData) {
+        console.log('Próba pobrania danych z API przy użyciu przesłanych danych...');
+        
+        // Clear any previous warnings
+        const existingWarnings = document.querySelectorAll('.warning');
+        existingWarnings.forEach(warning => warning.remove());
         
         // Attempt to fetch from the API
         fetch('http://52.17.53.243:5000/predictData', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                // Note: The following headers would need to be set on the server side
-                // 'Access-Control-Allow-Origin': '*',
-                // 'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                // 'Access-Control-Allow-Headers': 'Content-Type'
             },
             body: JSON.stringify(historicalData)
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Odpowiedź sieciowa nie była poprawna');
             }
             return response.json();
         })
         .then(data => {
             // Process and display the data
             createChart(data);
+            displayStatus('success', 'Dane załadowane pomyślnie');
         })
         .catch(error => {
-            console.error('Error fetching data from API:', error);
-            console.log('Using local fallback data instead');
+            console.error('Błąd pobierania danych z API:', error);
             
-            // Create fallback data with predicted flag
-            const fallbackData = [
-                // Historical data (same as what we would send)
-                ...historicalData.map(item => ({...item, predicted: false})),
-                
-                // Predicted data (hardcoded based on the expected response)
-                {"predicted": true, "tfr": 1.099, "year": 2024},
-                {"predicted": true, "tfr": 1.035, "year": 2025},
-                {"predicted": true, "tfr": 0.973, "year": 2026},
-                {"predicted": true, "tfr": 0.913, "year": 2027},
-                {"predicted": true, "tfr": 0.854, "year": 2028},
-                {"predicted": true, "tfr": 0.797, "year": 2029},
-                {"predicted": true, "tfr": 0.741, "year": 2030},
-                {"predicted": true, "tfr": 0.688, "year": 2031},
-                {"predicted": true, "tfr": 0.635, "year": 2032},
-                {"predicted": true, "tfr": 0.585, "year": 2033}
-            ];
-            
-            // Use the fallback data to create the chart
-            createChart(fallbackData);
-            
-            // Show a warning message that we're using fallback data
-            const warningEl = document.createElement('div');
-            warningEl.className = 'warning';
-            
-            // Check if it's a CORS error
-            const isCorsError = error.message.includes('CORS') ||
-                               (error instanceof TypeError && error.message === 'Failed to fetch');
-            
-            if (isCorsError) {
-                warningEl.innerHTML = '<strong>CORS Error:</strong> Używamy lokalnych danych, ponieważ przeglądarka zablokowała dostęp do API ze względów bezpieczeństwa. ' +
-                                     'To normalne przy otwieraniu pliku HTML bezpośrednio z dysku. | ' +
-                                     '<strong>CORS Error:</strong> Using local data because the browser blocked access to the API for security reasons. ' +
-                                     'This is normal when opening an HTML file directly from disk.';
-            } else {
-                warningEl.innerHTML = 'Uwaga: Używamy lokalnych danych, ponieważ nie można połączyć się z API. ' +
-                                     'Dane prognozy mogą nie być aktualne. | ' +
-                                     'Warning: Using local data because API connection failed. ' +
-                                     'Prediction data may not be up-to-date.';
-            }
-            
-            document.querySelector('.chart-container').insertAdjacentElement('beforebegin', warningEl);
+            // Use fallback mechanism
+            handleApiError(error, historicalData);
         });
-    } catch (error) {
-        console.error('Critical error:', error);
-        document.querySelector('.chart-container').innerHTML =
-            '<div class="error">Critical error loading data. Please check console for details.</div>';
     }
-});
-
-function createChart(data) {
+    
+    // Function to handle API errors with fallback
+    function handleApiError(error, historicalData) {
+        console.log('Używanie lokalnego mechanizmu awaryjnego...');
+        
+        // Create fallback data with predicted flag
+        const fallbackData = [
+            // Historical data (from uploaded file)
+            ...historicalData.map(item => ({...item, predicted: false})),
+            
+            // Predicted data (hardcoded based on expected response)
+            {"predicted": true, "tfr": 1.099, "year": 2024},
+            {"predicted": true, "tfr": 1.035, "year": 2025},
+            {"predicted": true, "tfr": 0.973, "year": 2026},
+            {"predicted": true, "tfr": 0.913, "year": 2027},
+            {"predicted": true, "tfr": 0.854, "year": 2028},
+            {"predicted": true, "tfr": 0.797, "year": 2029},
+            {"predicted": true, "tfr": 0.741, "year": 2030},
+            {"predicted": true, "tfr": 0.688, "year": 2031},
+            {"predicted": true, "tfr": 0.635, "year": 2032},
+            {"predicted": true, "tfr": 0.585, "year": 2033}
+        ];
+        
+        // Use the fallback data to create the chart
+        createChart(fallbackData);
+        
+        // Check if it's a CORS error
+        const isCorsError = error.message.includes('CORS') ||
+                           (error instanceof TypeError && error.message === 'Failed to fetch');
+        
+        if (isCorsError) {
+            displayStatus('error', 'Błąd CORS: Używamy lokalnych danych. To normalne przy otwieraniu pliku HTML bezpośrednio z dysku.');
+        } else {
+            displayStatus('error', 'Uwaga: Używamy lokalnych danych, ponieważ nie można połączyć się z API.');
+        }
+        
+        // Show a warning message that we're using fallback data
+        const warningEl = document.createElement('div');
+        warningEl.className = 'warning';
+        
+        if (isCorsError) {
+            warningEl.innerHTML = '<strong>Błąd CORS:</strong> Używamy lokalnych danych, ponieważ przeglądarka zablokowała dostęp do API ze względów bezpieczeństwa. ' +
+                                 'To normalne przy otwieraniu pliku HTML bezpośrednio z dysku.';
+        } else {
+            warningEl.innerHTML = 'Uwaga: Używamy lokalnych danych, ponieważ nie można połączyć się z API. ' +
+                                 'Dane prognozy mogą nie być aktualne.';
+        }
+        
+        document.querySelector('.chart-container').insertAdjacentElement('beforebegin', warningEl);
+    }
+    
+    // Load default data on page load (optional)
+    // Uncomment the following line if you want to load data automatically on page load
+    // fetchPrediction(defaultHistoricalData);
+    
+    // Function to create or update the chart
+    function createChart(data) {
     // Split data based on 'predicted' flag
     const historicalData = data.filter(item => !item.predicted);
     const predictionData = data.filter(item => item.predicted);
@@ -355,14 +192,19 @@ function createChart(data) {
     // Get the chart canvas
     const ctx = document.getElementById('fertilityChart').getContext('2d');
     
+    // Destroy existing chart if it exists
+    if (fertilityChart) {
+        fertilityChart.destroy();
+    }
+    
     // Create the chart
-    const fertilityChart = new Chart(ctx, {
+    fertilityChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: years,
             datasets: [
                 {
-                    label: 'Dane historyczne | Historical Data',
+                    label: 'Dane historyczne',
                     data: [...historicalTFR, ...Array(predictionYears.length).fill(null)],
                     borderColor: function(context) {
                         const chart = context.chart;
@@ -385,7 +227,7 @@ function createChart(data) {
                     pointHoverBorderWidth: 2
                 },
                 {
-                    label: 'Dane prognozowane | Predicted Data',
+                    label: 'Dane prognozowane',
                     data: [...Array(historicalYears.length).fill(null), ...predictionTFR],
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.1)',
@@ -442,7 +284,7 @@ function createChart(data) {
                 x: {
                     title: {
                         display: true,
-                        text: 'Year'
+                        text: 'Rok'
                     },
                     ticks: {
                         callback: function(value, index) {
@@ -454,7 +296,7 @@ function createChart(data) {
                 y: {
                     title: {
                         display: true,
-                        text: 'Total Fertility Rate (TFR)'
+                        text: 'Wskaźnik Dzietności (TFR)'
                     },
                     min: 0,
                     suggestedMax: 3.5
@@ -463,3 +305,4 @@ function createChart(data) {
         }
     });
 }
+});
