@@ -7,6 +7,7 @@ A Flask-based REST API server that uses the TBATS (Trigonometric Seasonality, Bo
 - Single endpoint `/predictData` for time series forecasting
 - Uses TBATS model for accurate forecasting
 - Returns both historical and predicted data in a consistent format
+- Supports Cross-Origin Resource Sharing (CORS) for browser access
 
 ## Installation
 
@@ -34,6 +35,11 @@ python -m venv venv
 4. Install dependencies:
 ```
 pip install -r requirements.txt
+```
+
+5. If you've updated from a previous version, make sure Flask-CORS is installed:
+```
+pip install flask-cors
 ```
 
 ## Usage
@@ -90,6 +96,10 @@ Forecasts the next 10 data points based on the provided historical data.
 **Error Responses:**
 - 400 Bad Request: Invalid JSON or missing required fields
 - 500 Internal Server Error: Model training or prediction errors
+
+### CORS Support
+
+This API supports Cross-Origin Resource Sharing (CORS), allowing it to be accessed from web browsers even when the frontend is hosted on a different domain or opened directly from the file system. This is enabled through the Flask-CORS extension.
 
 ## Production Deployment
 

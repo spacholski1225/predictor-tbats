@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from models.forecaster import TBATSForecaster
 from utils.data_handler import preprocess_data, postprocess_results
 
 app = Flask(__name__)
+# Włączenie CORS dla wszystkich źródeł
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/predictData', methods=['POST'])
 def predict_data():

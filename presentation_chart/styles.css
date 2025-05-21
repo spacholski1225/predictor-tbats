@@ -83,6 +83,18 @@ body {
     font-weight: bold;
 }
 
+.warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    border-radius: 8px;
+    text-align: center;
+    padding: 12px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
 @media (max-width: 768px) {
     .chart-container {
         height: 50vh;

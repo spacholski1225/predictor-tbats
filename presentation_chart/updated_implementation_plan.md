@@ -1,3 +1,19 @@
+# Updated Implementation Plan for Fertility Rate Chart
+
+## Overview of Changes
+
+We need to update the presentation_chart project to fetch data from the new endpoint `http://52.17.53.243:5000/predictData` using a POST request and use the `predicted` flag to differentiate between historical and prediction data.
+
+## Key Modifications
+
+1. Change the endpoint from `http://localhost:5000/getData` to `http://52.17.53.243:5000/predictData`
+2. Switch from GET to POST request and include historical data in the request body
+3. Update data filtering to use the `predicted` flag instead of checking year values
+4. Update error messages to reference the new endpoint
+
+## Complete Implementation for script.js
+
+```javascript
 document.addEventListener('DOMContentLoaded', function() {
     // Historical data to send in the POST request (up to 2023)
     const historicalData = [
@@ -259,84 +275,29 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     ];
     
-    // Try to fetch data from the API, but use local data as fallback if it fails
-    try {
-        console.log('Attempting to fetch data from API...');
-        
-        // Attempt to fetch from the API
-        fetch('http://52.17.53.243:5000/predictData', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Note: The following headers would need to be set on the server side
-                // 'Access-Control-Allow-Origin': '*',
-                // 'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                // 'Access-Control-Allow-Headers': 'Content-Type'
-            },
-            body: JSON.stringify(historicalData)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Process and display the data
-            createChart(data);
-        })
-        .catch(error => {
-            console.error('Error fetching data from API:', error);
-            console.log('Using local fallback data instead');
-            
-            // Create fallback data with predicted flag
-            const fallbackData = [
-                // Historical data (same as what we would send)
-                ...historicalData.map(item => ({...item, predicted: false})),
-                
-                // Predicted data (hardcoded based on the expected response)
-                {"predicted": true, "tfr": 1.099, "year": 2024},
-                {"predicted": true, "tfr": 1.035, "year": 2025},
-                {"predicted": true, "tfr": 0.973, "year": 2026},
-                {"predicted": true, "tfr": 0.913, "year": 2027},
-                {"predicted": true, "tfr": 0.854, "year": 2028},
-                {"predicted": true, "tfr": 0.797, "year": 2029},
-                {"predicted": true, "tfr": 0.741, "year": 2030},
-                {"predicted": true, "tfr": 0.688, "year": 2031},
-                {"predicted": true, "tfr": 0.635, "year": 2032},
-                {"predicted": true, "tfr": 0.585, "year": 2033}
-            ];
-            
-            // Use the fallback data to create the chart
-            createChart(fallbackData);
-            
-            // Show a warning message that we're using fallback data
-            const warningEl = document.createElement('div');
-            warningEl.className = 'warning';
-            
-            // Check if it's a CORS error
-            const isCorsError = error.message.includes('CORS') ||
-                               (error instanceof TypeError && error.message === 'Failed to fetch');
-            
-            if (isCorsError) {
-                warningEl.innerHTML = '<strong>CORS Error:</strong> Używamy lokalnych danych, ponieważ przeglądarka zablokowała dostęp do API ze względów bezpieczeństwa. ' +
-                                     'To normalne przy otwieraniu pliku HTML bezpośrednio z dysku. | ' +
-                                     '<strong>CORS Error:</strong> Using local data because the browser blocked access to the API for security reasons. ' +
-                                     'This is normal when opening an HTML file directly from disk.';
-            } else {
-                warningEl.innerHTML = 'Uwaga: Używamy lokalnych danych, ponieważ nie można połączyć się z API. ' +
-                                     'Dane prognozy mogą nie być aktualne. | ' +
-                                     'Warning: Using local data because API connection failed. ' +
-                                     'Prediction data may not be up-to-date.';
-            }
-            
-            document.querySelector('.chart-container').insertAdjacentElement('beforebegin', warningEl);
-        });
-    } catch (error) {
-        console.error('Critical error:', error);
-        document.querySelector('.chart-container').innerHTML =
-            '<div class="error">Critical error loading data. Please check console for details.</div>';
-    }
+    // Fetch data from the new API endpoint with POST request
+    fetch('http://52.17.53.243:5000/predictData', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(historicalData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Process and display the data
+        createChart(data);
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+        document.querySelector('.chart-container').innerHTML = 
+            '<div class="error">Error loading data. Please make sure the API server is running at http://52.17.53.243:5000</div>';
+    });
 });
 
 function createChart(data) {
@@ -463,3 +424,41 @@ function createChart(data) {
         }
     });
 }
+```
+
+## Key Changes Explained
+
+1. **Data Fetching:**
+   - Changed endpoint URL to `http://52.17.53.243:5000/predictData`
+   - Changed request method from GET to POST
+   - Added request headers to specify JSON content type
+   - Included historical data in the request body
+   - Updated error message to reference the new endpoint
+
+2. **Data Processing:**
+   - Changed filtering logic from year-based (`item.year <= 2023`) to flag-based (`!item.predicted`)
+   - Maintained the same chart structure and visual style
+
+3. **Enhanced Tooltip:**
+   - Added a custom tooltip callback to indicate when data is predicted
+   - This provides additional clarity beyond the visual styling
+
+## Testing Instructions
+
+1. Replace the current `script.js` file with this new implementation
+2. Open the `index.html` file in a browser
+3. Check that:
+   - The chart loads data correctly
+   - Historical data appears as a solid blue line
+   - Predicted data appears as a dashed red line
+   - Hovering over data points shows appropriate tooltips with prediction indicators
+
+## Notes for Implementation
+
+- The implementation handles the separation of historical and predicted data based on the `predicted` flag
+- Error handling is robust and will display a user-friendly message if the API cannot be reached
+- The tooltip enhancement provides additional clarity about which data points are predictions
+
+## Additional Information
+
+This implementation maintains the same visual style and user experience as the original, but adapts to the new data source and structure. The chart will continue to effectively communicate the distinction between historical and predicted fertility rates.
