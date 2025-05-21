@@ -50,22 +50,6 @@ def combine_data(historical_data, predictions):
     return combined_data
 
 
-def save_to_json(data, file_path):
-    """
-    Save data to JSON file.
-    
-    Args:
-        data (list): Data to save.
-        file_path (str): Path to save the JSON file.
-        
-    Returns:
-        list: The saved data.
-    """
-    with open(file_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2)
-    
-    return data
-
 
 def validate_predictions(predictions, min_value=0.0, max_value=10.0):
     """

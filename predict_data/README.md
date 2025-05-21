@@ -8,14 +8,54 @@ This application uses the TBATS (Trigonometric Seasonality, Box-Cox transformati
 2. Install the required dependencies:
 
 ```bash
-pip install tbats pandas numpy matplotlib
+pip install tbats pandas numpy matplotlib flask flask-cors
 ```
 
 ## Usage
 
-### Basic Usage
+### Flask API Server
 
-Run the prediction with default settings:
+The application now provides a Flask API server that allows you to make predictions via HTTP requests:
+
+```bash
+python -m predict_data.run_server
+```
+
+This will start a Flask server on port 5000 with the following endpoint:
+
+- **Endpoint**: `/predictData`
+- **Method**: POST
+- **Content-Type**: application/json
+- **Request Body**: Array of objects with `year` and `tfr` fields
+- **Response**: Combined historical data and predictions
+
+Example request using curl:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d @get_data/fertility_poland_1939_2023.json http://localhost:5000/predictData
+```
+
+Example request using Python:
+
+```python
+import requests
+import json
+
+# Load data from file
+with open('get_data/fertility_poland_1939_2023.json', 'r') as f:
+    data = json.load(f)
+
+# Send request to API
+response = requests.post('http://localhost:5000/predictData', json=data)
+
+# Get predictions
+predictions = response.json()
+print(predictions)
+```
+
+### Command Line Usage (Legacy)
+
+You can still run the prediction with the command line interface:
 
 ```bash
 python -m predict_data.main
@@ -24,10 +64,10 @@ python -m predict_data.main
 This will:
 - Load historical fertility rate data from `download_tfr/fertility_poland_1939_2023.json`
 - Train a TBATS model on the historical data
-- Predict fertility rates for the next 5 years
+- Predict fertility rates for the next 10 years
 - Save the combined historical and predicted data to `predict_data/fertility_poland_prediction.json`
 
-### Command Line Options
+#### Command Line Options
 
 The application supports several command line options:
 
@@ -41,7 +81,7 @@ python -m predict_data.main --input INPUT_PATH --output OUTPUT_PATH --steps YEAR
 - `--plot`: Generate a plot of the historical data and predictions
 - `--plot-output`: Path to save the plot (if `--plot` is specified)
 
-### Example
+#### Example
 
 Generate predictions for the next 10 years and create a plot:
 
@@ -144,14 +184,16 @@ lower_bounds, upper_bounds = predictor.get_confidence_intervals(
 )
 ```
 
-## Programmatic Usage Example
+## Programmatic Usage Examples
+
+### Using the Module Directly
 
 Here's an example of how to use the prediction module programmatically:
 
 ```python
 from predict_data.data_loader import load_data, convert_to_time_series, preprocess_data
 from predict_data.tbats_predictor import TBATSPredictor
-from predict_data.utils import format_predictions, combine_data, save_to_json
+from predict_data.utils import format_predictions, combine_data
 
 # Load data
 historical_data = load_data('download_tfr/fertility_poland_1939_2023.json')
@@ -170,8 +212,63 @@ last_year = max(item['year'] for item in historical_data)
 formatted_predictions = format_predictions(historical_data, predictions, last_year + 1)
 combined_data = combine_data(historical_data, formatted_predictions)
 
-# Save results
-save_to_json(combined_data, 'results/custom_predictions.json')
+# Process the results
+print(f"Predicted {len(formatted_predictions)} years of fertility rates")
+for pred in formatted_predictions:
+    print(f"Year {pred['year']}: {pred['tfr']}")
+```
+
+### Using the API Client
+
+Here's an example of how to use the API from another Python application:
+
+```python
+import requests
+import json
+import matplotlib.pyplot as plt
+
+# Prepare data (or load from file)
+data = [
+    {"year": 2000, "tfr": 1.37},
+    {"year": 2001, "tfr": 1.31},
+    # ... more data points
+    {"year": 2023, "tfr": 1.158}
+]
+
+# Send request to API
+response = requests.post('http://localhost:5000/predictData', json=data)
+
+# Check if request was successful
+if response.status_code == 200:
+    # Get predictions
+    result = response.json()
+    
+    # Extract historical and prediction data
+    years = [item['year'] for item in result]
+    tfr_values = [item['tfr'] for item in result]
+    
+    # Find where predictions start (after the last historical year)
+    last_historical_year = max(item['year'] for item in data)
+    historical_years = [y for y in years if y <= last_historical_year]
+    historical_tfr = [tfr_values[i] for i, y in enumerate(years) if y <= last_historical_year]
+    
+    prediction_years = [y for y in years if y > last_historical_year]
+    prediction_tfr = [tfr_values[i] for i, y in enumerate(years) if y > last_historical_year]
+    
+    # Plot the results
+    plt.figure(figsize=(12, 6))
+    plt.plot(historical_years, historical_tfr, 'b-', label='Historical Data')
+    plt.plot(prediction_years, prediction_tfr, 'r--', label='Predictions')
+    plt.axvline(x=last_historical_year, color='gray', linestyle='--', alpha=0.7)
+    plt.xlabel('Year')
+    plt.ylabel('Total Fertility Rate')
+    plt.title('Poland Fertility Rate: Historical Data and Predictions')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.show()
+else:
+    print(f"Error: {response.status_code}")
+    print(response.text)
 ```
 
 ## Notes
