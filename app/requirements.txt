@@ -1,0 +1,5 @@
+Flask==2.3.3
+tbats==1.1.3
+pandas==2.1.0
+numpy==1.25.2
+gunicorn==21.2.0
